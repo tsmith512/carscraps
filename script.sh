@@ -17,3 +17,5 @@ cat queue.txt >> expired.txt
 rm queue.txt
 
 sed -i '/HTTP-EQUIV="Refresh"/d' htdocs/mirror/index.html
+
+grep -ri '<title>' htdocs/mirror/ | grep -v "external.html" | grep -v "index.html" > index.txt
