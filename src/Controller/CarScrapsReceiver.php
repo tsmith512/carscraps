@@ -28,6 +28,37 @@ class CarScrapsReceiver {
       case "url_verification":
         return new Response($input['challenge']);
         break;
+
+      // Slack Apps Events API is notifying of a subscribed event:
+      case "event_callback":
+        $event = $input['event'];
+
+        switch ($event['type']) {
+          case "link_shared":
+
+            // Capture links that Slack is giving us.
+            $links = array();
+
+            foreach($event['links'] as $link) {
+              $links[] = $link['url'];
+            }
+
+            try {
+              $this->enqueue($links);
+            } catch {
+              return new Response('Something bad happened', 500);
+            }
+            return new Response($event['links'][0]['url'], 200);
+            break;
+        }
+        break;
     }
+  }
+
+  /**
+   * Receiving an array of links, they need to be enqueued for mirroring.
+   */
+  public function enqueue($links = NULL) {
+
   }
 }
