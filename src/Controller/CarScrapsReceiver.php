@@ -43,12 +43,9 @@ class CarScrapsReceiver {
               $links[] = $link['url'];
             }
 
-            try {
-              $this->enqueue($links);
-            } catch {
-              return new Response('Something bad happened', 500);
-            }
-            return new Response($event['links'][0]['url'], 200);
+            $this->enqueue($links);
+
+            return new Response("Links captured", 200);
             break;
         }
         break;
@@ -59,6 +56,10 @@ class CarScrapsReceiver {
    * Receiving an array of links, they need to be enqueued for mirroring.
    */
   public function enqueue($links = NULL) {
-
+    try {
+      file_put_contents(__DIR__ . "/../../public/queue.txt", implode(PHP_EOL, $links) . PHP_EOL, FILE_APPEND | LOCK_EX);
+    } catch (Exception $e) {
+      return new Response($e->getMessage(), 500);
+    }
   }
 }
