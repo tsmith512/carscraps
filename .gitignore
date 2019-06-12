@@ -1,6 +1,16 @@
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
 queue.txt
 saves.txt
 expired.txt
 index.txt
-htdocs/queue.txt
-htdocs/mirror
+public/queue.txt
+public/mirror
