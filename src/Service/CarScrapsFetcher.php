@@ -47,7 +47,7 @@ class CarScrapsFetcher {
 
     // The bash script is written to echo the title from the page.
     // @TODO outta do somethin' with that...
-    echo $process->getOutput();
+    $car->setTitle($process->getOutput() ?: "(Unknown title)");
     $car->setMirrored(true);
 
     $this->entityManager->persist($car);
