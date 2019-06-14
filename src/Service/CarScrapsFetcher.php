@@ -45,6 +45,8 @@ class CarScrapsFetcher {
       throw new ProcessFailedException($process);
     }
 
+    // The bash script is written to echo the title from the page.
+    // @TODO outta do somethin' with that...
     echo $process->getOutput();
     $car->setMirrored(true);
 
