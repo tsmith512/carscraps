@@ -13,7 +13,15 @@ class CarScrapsFetcher {
   /**
    * Returns the count of cars that haven't been mirrored
    */
-  public function unfetchedCars() {
+  public function countUnfetchedCars() {
     return count($this->carRepository->getUnfetchedCars());
+  }
+
+  /**
+   * Mirror the Craigslist post of a car
+   */
+  public function fetchCar(Car $car) {
+    // @TODO:
+    var_dump($car);
   }
 }

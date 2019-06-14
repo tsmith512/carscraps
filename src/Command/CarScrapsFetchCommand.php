@@ -32,10 +32,14 @@ class CarScrapsFetchCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$howMany = $this->fetcher->unfetchedCars()) {
+        if (!$howMany = $this->fetcher->countUnfetchedCars()) {
             $io->success('There are no unfetched cars in the mirroring queue.');
         } else {
             $io->text("There are {$howMany} cars in the queue.");
+
+            foreach ($this->fetcher->carRepository->getUnfetchedCars() as $car) {
+                $this->fetcher->fetchCar($car);
+            }
         }
     }
 }
