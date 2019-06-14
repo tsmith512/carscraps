@@ -14,6 +14,7 @@ class SlackMetaService {
   private $slackToken;
 
   public $allSlackChannels = array();
+  public $allSlackUsers = array();
 
   public function __construct() {
     $cache = new FilesystemAdapter();
@@ -50,6 +51,33 @@ class SlackMetaService {
       return $channels;
     });
 
-    var_dump($this->allSlackChannels);
+    $this->allSlackUsers = $cache->get('slack_meta_users', function (ItemInterface $item) {
+      $item->expiresAfter(60 * 60 * 6);
+
+      $httpClient = new CurlHttpClient();
+      $response = $httpClient->request('GET', 'https://slack.com/api/users.list', [
+        'query' => [
+          'token' => $this->slackToken,
+          'include_locale' => FALSE,
+          'limit' => 50,
+        ]
+      ]);
+
+      $data = json_decode($response->getContent());
+
+      if (empty($data->members)) {
+        // @TODO: There aren't any. Uh oh.
+      }
+
+      $users = array();
+      foreach ($data->members as $user) {
+        $users[$user->id] = array(
+          'handle' => $user->name,
+          'real_name' => !empty($user->real_name) ? $user->real_name : $user->name
+        );
+      }
+
+      return $users;
+    });
   }
 }
