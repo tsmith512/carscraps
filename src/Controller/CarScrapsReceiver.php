@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Car;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,13 +13,15 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class offers API endpoints related to receiving requests and scraping
  * requested URLs. Currently only supports a handful of Slack App events.
  */
-class CarScrapsReceiver {
+class CarScrapsReceiver extends AbstractController {
   /**
    * @Route("/api/v1/slack", methods={"POST"})
    */
   public function slack() {
     $request = Request::createFromGlobals();
     $input = json_decode($request->getContent(), true);
+
+    $entityManager = $this->getDoctrine()->getManager();
 
     // Bail if there was no request object from Slack.
     if (empty($input)) {
@@ -41,6 +46,16 @@ class CarScrapsReceiver {
 
             foreach($event['links'] as $link) {
               $links[] = $link['url'];
+
+              $car = new Car();
+              $car->setUrl($link['url']);
+              $car->setUser($event['user']);
+              $car->setChannel($event['channel']);
+              $car->setTimestamp($event['message_ts']);
+              $car->setMirrored(false);
+
+              $entityManager->persist($car);
+              $entityManager->flush();
             }
 
             $this->enqueue($links);
