@@ -25,9 +25,6 @@ class CarScrapsFetcher {
    * Mirror the Craigslist post of a car
    */
   public function fetchCar(Car $car) {
-    // @TODO:
-    var_dump($car);
-
     if ($car->getMirrored()) {
       // This has already been (marked as?) fetched, sooooooo
       return false;
