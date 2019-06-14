@@ -28,7 +28,7 @@ class MirrorIndex extends AbstractController {
       foreach ($cars as $car) {
         $mirrorUrl = preg_replace('/https?:\/\//', '/mirror/', $car->getUrl());
         $title = $car->getTitle() ?: '(Unknown Title)';
-        echo "<li><a href='$mirrorUrl'>{$title}</a></li>";
+        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$car->getUser()} in {$car->getChannel()}</em></li>";
       }
       echo "</ul>";
     } else {
