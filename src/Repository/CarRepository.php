@@ -22,13 +22,26 @@ class CarRepository extends ServiceEntityRepository
     /**
      * @return Car[] Returns an array of Car objects
      */
+    public function getFetchedCars()
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.mirrored = :val')
+            ->setParameter('val', TRUE)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return Car[] Returns an array of Car objects
+     */
     public function getUnfetchedCars()
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.mirrored = :val')
             ->setParameter('val', FALSE)
             ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;

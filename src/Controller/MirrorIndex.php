@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Car;
+use App\Repository\CarRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,28 +13,32 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class offers API endpoints related to receiving requests and scraping
  * requested URLs. Currently only supports a handful of Slack App events.
  */
-class MirrorIndex {
+class MirrorIndex extends AbstractController {
+  public function __construct(CarRepository $carRepository) {
+    $this->carRepository = $carRepository;
+  }
   /**
    * @Route("/", methods={"GET"})
    */
   public function index() {
-    ob_start();
-
-    $handle = fopen("index.txt", "r");
-    if ($handle) {
+    $cars = $this->carRepository->getFetchedCars();
+    $queue = $this->carRepository->getUnfetchedCars();
+    if (!empty($cars)) {
       echo "<ul>";
-      while (($line = fgets($handle)) !== false) {
-        $parts = explode(":", $line);
-        $file = str_replace("public/mirror", "", $parts[0]);
-        $title = preg_replace("/<\/?title>/", "", trim($parts[1]));
-        echo "<li><a href=\"/mirror/{$file}\">{$title}</a></li>";
+      foreach ($cars as $car) {
+        $mirrorUrl = preg_replace('/https?:\/\//', '/mirror/', $car->getUrl());
+        $title = $car->getTitle() ?: '(Unknown Title)';
+        echo "<li><a href='$mirrorUrl'>{$title}</a></li>";
       }
-      fclose($handle);
       echo "</ul>";
     } else {
       echo "Error";
     }
 
-    return new Response(ob_get_clean(), 200);
+    if (!empty($queue)) {
+      echo "There are " . count($queue) . " posts in the fetch queue.";
+    }
+
+    return new Response('', 200);
   }
 }
