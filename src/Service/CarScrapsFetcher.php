@@ -4,10 +4,14 @@ namespace App\Service;
 
 use App\Entity\Car;
 use App\Repository\CarRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class CarScrapsFetcher {
-  public function __construct(CarRepository $carRepo) {
+  public function __construct(CarRepository $carRepo, EntityManagerInterface $entityManager) {
     $this->carRepository = $carRepo;
+    $this->entityManager = $entityManager;
   }
 
   /**
@@ -23,5 +27,28 @@ class CarScrapsFetcher {
   public function fetchCar(Car $car) {
     // @TODO:
     var_dump($car);
+
+    if ($car->getMirrored()) {
+      // This has already been (marked as?) fetched, sooooooo
+      return false;
+    }
+
+    if (empty($car->getUrl())) {
+      // This post has no URL, that's bad
+      return false;
+    }
+
+    $process = new Process([dirname(__FILE__, 3) . '/bin/fetch.sh', $car->getUrl()]);
+    $process->run();
+
+    if (!$process->isSuccessful()) {
+      throw new ProcessFailedException($process);
+    }
+
+    echo $process->getOutput();
+    $car->setMirrored(true);
+
+    $this->entityManager->persist($car);
+    $this->entityManager->flush();
   }
 }
