@@ -80,4 +80,20 @@ class SlackMetaService {
       return $users;
     });
   }
+
+  public function getChannelName($channel_id) {
+    if (isset($this->allSlackChannels[$channel_id])) {
+      return $this->allSlackChannels[$channel_id];
+    } else {
+      return false;
+    }
+  }
+
+  public function getUserName($user_id) {
+    if (isset($this->allSlackUsers[$user_id])) {
+      return $this->allSlackUsers[$user_id]['real_name'];
+    } else {
+      return false;
+    }
+  }
 }
