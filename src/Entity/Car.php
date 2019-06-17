@@ -46,6 +46,11 @@ class Car
      */
     private $title;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $slackts;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +124,18 @@ class Car
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getSlackts(): ?string
+    {
+        return $this->slackts;
+    }
+
+    public function setSlackts(?string $slackts): self
+    {
+        $this->slackts = $slackts;
 
         return $this;
     }
