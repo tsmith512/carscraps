@@ -51,7 +51,7 @@ class CarScrapsReceiver extends AbstractController {
               $car->setUrl($link['url']);
               $car->setUser($event['user']);
               $car->setChannel($event['channel']);
-              $car->setTimestamp($event['message_ts']);
+              $car->setSlackts($event['message_ts']);
               $car->setMirrored(false);
 
               $entityManager->persist($car);

@@ -25,9 +25,6 @@ class CarScrapsFetcher {
    * Mirror the Craigslist post of a car
    */
   public function fetchCar(Car $car) {
-    // @TODO:
-    var_dump($car);
-
     if ($car->getMirrored()) {
       // This has already been (marked as?) fetched, sooooooo
       return false;
@@ -47,7 +44,7 @@ class CarScrapsFetcher {
 
     // The bash script is written to echo the title from the page.
     // @TODO outta do somethin' with that...
-    $car->setTitle($process->getOutput() ?: "(Unknown title)");
+    $car->setTitle(trim($process->getOutput()) ?: "(Unknown title)");
     $car->setMirrored(true);
 
     $this->entityManager->persist($car);

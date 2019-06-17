@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Car;
 use App\Repository\CarRepository;
+use App\Service\SlackMetaService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +15,9 @@ use Symfony\Component\Routing\Annotation\Route;
  * requested URLs. Currently only supports a handful of Slack App events.
  */
 class MirrorIndex extends AbstractController {
-  public function __construct(CarRepository $carRepository) {
+  public function __construct(CarRepository $carRepository, SlackMetaService $slackMetaService) {
     $this->carRepository = $carRepository;
+    $this->slackMetaService = $slackMetaService;
   }
   /**
    * @Route("/", methods={"GET"})
@@ -28,7 +30,10 @@ class MirrorIndex extends AbstractController {
       foreach ($cars as $car) {
         $mirrorUrl = preg_replace('/https?:\/\//', '/mirror/', $car->getUrl());
         $title = $car->getTitle() ?: '(Unknown Title)';
-        echo "<li><a href='$mirrorUrl'>{$title}</a></li>";
+        $user = $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser();
+        $channel = $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel();
+        $timestamp = $car->getSlackts();
+        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$user} in {$channel} at {$timestamp}</em></li>";
       }
       echo "</ul>";
     } else {
