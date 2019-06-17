@@ -32,7 +32,8 @@ class MirrorIndex extends AbstractController {
         $title = $car->getTitle() ?: '(Unknown Title)';
         $user = $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser();
         $channel = $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel();
-        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$user} in {$channel}</em></li>";
+        $timestamp = $car->getSlackts();
+        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$user} in {$channel} at {$timestamp}</em></li>";
       }
       echo "</ul>";
     } else {
