@@ -118,7 +118,7 @@ class Car
 
     public function getTitle(): ?string
     {
-        return $this->title;
+        return preg_replace('/ - cars &amp; trucks.+/', '', $this->title);
     }
 
     public function setTitle(?string $title): self
