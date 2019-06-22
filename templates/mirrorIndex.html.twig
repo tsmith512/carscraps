@@ -10,7 +10,6 @@
         <tr>
           <th>
             Title
-            <input type="text" class="search" placeholder="Search Titles" />
           </th>
           <th>
             User
@@ -59,7 +58,18 @@
 <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script>
   $(document).ready( function () {
-    $('#carIndexTable').DataTable();
+    var carIndex = $('#carIndexTable').DataTable({
+      paging: false,
+      columnDefs: [
+        { targets: [0], }, // Title
+
+        // @TODO: Want to do dropdown filters for these two:
+        { targets: [1], orderable: false }, // User
+        { targets: [2], orderable: false }, // Channel
+
+        { targets: [3], searchable: false } // Date/Time
+      ]
+    });
   } );
 </script>
 {% endblock %}
