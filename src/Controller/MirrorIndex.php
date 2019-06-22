@@ -26,32 +26,29 @@ class MirrorIndex extends AbstractController {
     $cars = $this->carRepository->getFetchedCars();
     $queue = $this->carRepository->getUnfetchedCars();
 
-   // @TODO: This is not how to do this:
-   ob_start();
+    $index = array();
 
     if (!empty($cars)) {
-      echo "<ul>";
       foreach ($cars as $car) {
-        $mirrorUrl = preg_replace('/https?:\/\//', '/mirror/', $car->getUrl());
-        $title = $car->getTitle() ?: '(Unknown Title)';
-        $user = $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser();
-        $channel = $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel();
-        $timestamp = $car->getSlackts();
-        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$user} in {$channel} at {$timestamp}</em></li>";
+        $index[] = array(
+          'mirrorUrl' => preg_replace('/https?:\/\//', '/mirror/', $car->getUrl()),
+          'title' => $car->getTitle() ?: '(Unknown Title)',
+          'user' => $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser(),
+          'channel' => $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel(),
+          'timestamp' => $car->getSlackts(),
+        );
       }
-      echo "</ul>";
     } else {
+      // @TODO: Uh, this is not how to...
       echo "Error";
     }
 
-    if (!empty($queue)) {
-      echo "There are " . count($queue) . " posts in the fetch queue.";
-    }
+    $queueCount = (!empty($queue)) ? count($queue) : false;
 
-    // @TODO: Still not how to do this.
-    $content = ob_get_clean();
-
-    // @TODO: This is still definitely not how to do this.
-    return $this->render('mirrorIndex.html.twig', ['title' => 'Car Scraps Index', 'body' => $content]);
+    return $this->render('mirrorIndex.html.twig', [
+      'title' => 'Car Scraps Index',
+      'cars' => $index,
+      'queue' => $queueCount,
+    ]);
   }
 }

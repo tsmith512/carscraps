@@ -1,4 +1,15 @@
 {# templates/mirrorIndex.html.twig renders src/Controller/MirrorIndex.php #}
 {% extends 'base.html.twig' %}
 
-{% block body %}{{ body }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+  {% if cars %}
+    <ul>
+      {% for car in cars %}
+        <li><a href='{{ car.mirrorUrl }}'>{{ car.title }}</a><br /><em>Posted by {{ car.user }} in {{ car.channel }} at {{ car.timestamp }}</em></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% if queue %}There are {{ queue }} posts in the fetch queue.{% endif %}
+{% endblock %}
