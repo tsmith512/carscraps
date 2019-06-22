@@ -25,6 +25,10 @@ class MirrorIndex extends AbstractController {
   public function index() {
     $cars = $this->carRepository->getFetchedCars();
     $queue = $this->carRepository->getUnfetchedCars();
+
+   // @TODO: This is not how to do this:
+   ob_start();
+
     if (!empty($cars)) {
       echo "<ul>";
       foreach ($cars as $car) {
@@ -44,6 +48,10 @@ class MirrorIndex extends AbstractController {
       echo "There are " . count($queue) . " posts in the fetch queue.";
     }
 
-    return new Response('', 200);
+    // @TODO: Still not how to do this.
+    $content = ob_get_clean();
+
+    // @TODO: This is still definitely not how to do this.
+    return $this->render('mirrorIndex.html.twig', ['title' => 'Car Scraps Index', 'body' => $content]);
   }
 }
