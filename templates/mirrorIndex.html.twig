@@ -1,0 +1,99 @@
+{# templates/mirrorIndex.html.twig renders src/Controller/MirrorIndex.php #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+  {% if cars %}
+    <table id="carIndexTable">
+      <thead>
+        <tr>
+          <th>
+            Title
+          </th>
+          <th>
+            User
+          </th>
+          <th>
+            Channel
+          </th>
+          <th>
+            Date/Time*
+          </th>
+        </tr>
+      </thead>
+      <tbody class="carIndexTable">
+        {% for car in cars %}
+          <tr>
+            <td>
+              <a href='{{ car.mirrorUrl }}'>{{ car.title }}</a>
+            </td>
+            <td>
+              {{ car.user }}
+            </td>
+            <td>
+              {{ car.channel }}
+            </td>
+            <td>
+              <time datetime="{{ car.timestamp }}">{{ car.date }}</time>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <th></th>
+        <th colspan="3" align="right"><em>* when posted to Slack</em></th>
+      </tfoot>
+    </table>
+  {% endif %}
+  {% if queue %}There are {{ queue }} posts in the fetch queue.{% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script>
+  $(document).ready( function () {
+    var carIndex = $('#carIndexTable').DataTable({
+      paging: false,
+      columnDefs: [
+        { targets: [0], }, // Title
+
+        // @TODO: Want to do dropdown filters for these two:
+        { targets: [1], orderable: false }, // User
+        { targets: [2], orderable: false }, // Channel
+
+        { targets: [3], searchable: false } // Date/Time
+      ],
+
+      // Set up dropdowns for filtering in <TH>
+      // Based on https://www.datatables.net/examples/api/multi_filter_select.html
+      initComplete: function () {
+          this.api().columns([1, 2]).every( function () {
+              var column = this;
+              var select = $('<select><option value="">- Any ' + $(column.header()).text() + ' -</option></select>')
+                  .appendTo( $(column.header()).empty() )
+                  .on( 'change', function () {
+                      var val = $.fn.dataTable.util.escapeRegex(
+                          $(this).val()
+                      );
+
+                      column
+                          .search( val ? '^'+val+'$' : '', true, false )
+                          .draw();
+                  } );
+
+              column.data().unique().sort().each( function ( d, j ) {
+                  select.append( '<option value="'+d+'">'+d+'</option>' )
+              } );
+          } );
+      }
+
+    });
+  } );
+</script>
+{% endblock %}

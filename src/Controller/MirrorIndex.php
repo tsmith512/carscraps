@@ -25,25 +25,33 @@ class MirrorIndex extends AbstractController {
   public function index() {
     $cars = $this->carRepository->getFetchedCars();
     $queue = $this->carRepository->getUnfetchedCars();
+
+    $index = array();
+
     if (!empty($cars)) {
-      echo "<ul>";
       foreach ($cars as $car) {
-        $mirrorUrl = preg_replace('/https?:\/\//', '/mirror/', $car->getUrl());
-        $title = $car->getTitle() ?: '(Unknown Title)';
-        $user = $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser();
-        $channel = $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel();
-        $timestamp = $car->getSlackts();
-        echo "<li><a href='$mirrorUrl'>{$title}</a><br /><em>Posted by {$user} in {$channel} at {$timestamp}</em></li>";
+        $timestamp = !empty($car->getSlackts()) ? explode('.', $car->getSlackts())[0] : false;
+        $date = ($timestamp) ? date('D d M Y', $timestamp) : false;
+        $index[] = array(
+          'mirrorUrl' => preg_replace('/https?:\/\//', '/mirror/', $car->getUrl()),
+          'title' => $car->getTitle() ?: '(Unknown Title)',
+          'user' => $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser(),
+          'channel' => $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel(),
+          'timestamp' => $date ? date('c', $timestamp) : false,
+          'date' => $date,
+        );
       }
-      echo "</ul>";
     } else {
+      // @TODO: Uh, this is not how to...
       echo "Error";
     }
 
-    if (!empty($queue)) {
-      echo "There are " . count($queue) . " posts in the fetch queue.";
-    }
+    $queueCount = (!empty($queue)) ? count($queue) : false;
 
-    return new Response('', 200);
+    return $this->render('mirrorIndex.html.twig', [
+      'title' => 'Car Scraps Index',
+      'cars' => $index,
+      'queue' => $queueCount,
+    ]);
   }
 }
