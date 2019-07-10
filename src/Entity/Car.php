@@ -61,6 +61,15 @@ class Car
         return $this->url;
     }
 
+    /**
+     * Return the URL to the locally mirrored post instead of the stored
+     * Craigslist ad URL.
+     */
+    public function getMirrorUrl(): ?string
+    {
+        return preg_replace('/https?:\/\//', '/mirror/', $this->url);
+    }
+
     public function setUrl(string $url): self
     {
         $this->url = $url;
@@ -138,5 +147,15 @@ class Car
         $this->slackts = $slackts;
 
         return $this;
+    }
+
+    /**
+     * Pull the Craiglist region/city from the subdomain of the post and return
+     */
+    public function getCity(): ?string
+    {
+        $matches = array();
+        preg_match('/\/\/(\w+)\./', $this->url, $matches);
+        return isset($matches[1]) ? $matches[1] : NULL;
     }
 }
