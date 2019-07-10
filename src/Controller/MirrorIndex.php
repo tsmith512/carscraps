@@ -35,6 +35,7 @@ class MirrorIndex extends AbstractController {
         $index[] = array(
           'mirrorUrl' => $car->getMirrorUrl(),
           'title' => $car->getTitle() ?: '(Unknown Title)',
+          'city' => $car->getCity() ?: '(Unknown City)',
           'user' => $this->slackMetaService->getUserName($car->getUser()) ?: $car->getUser(),
           'channel' => $this->slackMetaService->getChannelName($car->getChannel()) ?: $car->getChannel(),
           'timestamp' => $date ? date('c', $timestamp) : false,

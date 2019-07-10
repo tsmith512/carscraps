@@ -148,4 +148,14 @@ class Car
 
         return $this;
     }
+
+    /**
+     * Pull the Craiglist region/city from the subdomain of the post and return
+     */
+    public function getCity(): ?string
+    {
+        $matches = array();
+        preg_match('/\/\/(\w+)\./', $this->url, $matches);
+        return isset($matches[1]) ? $matches[1] : NULL;
+    }
 }
