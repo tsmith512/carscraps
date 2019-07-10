@@ -61,6 +61,15 @@ class Car
         return $this->url;
     }
 
+    /**
+     * Return the URL to the locally mirrored post instead of the stored
+     * Craigslist ad URL.
+     */
+    public function getMirrorUrl(): ?string
+    {
+        return preg_replace('/https?:\/\//', '/mirror/', $this->url);
+    }
+
     public function setUrl(string $url): self
     {
         $this->url = $url;
