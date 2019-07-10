@@ -40,7 +40,7 @@
             <td>
               {{ car.channel }}
             </td>
-            <td>
+            <td data-sort="{{ car.timestamp }}">
               <time datetime="{{ car.timestamp }}">{{ car.date }}</time>
             </td>
           </tr>
@@ -71,16 +71,16 @@
         { targets: [0], }, // Title
 
         // @TODO: Want to do dropdown filters for these two:
-        { targets: [1], orderable: false }, // User
-        { targets: [2], orderable: false }, // Channel
-
-        { targets: [3], searchable: false } // Date/Time
+        { targets: [1], orderable: false }, // City
+        { targets: [2], orderable: false }, // User
+        { targets: [3], orderable: false }, // Channel
+        { targets: [4], searchable: false } // Date/Time
       ],
 
       // Set up dropdowns for filtering in <TH>
       // Based on https://www.datatables.net/examples/api/multi_filter_select.html
       initComplete: function () {
-          this.api().columns([2, 3]).every( function () {
+          this.api().columns([1, 2, 3]).every( function () {
               var column = this;
               var select = $('<select><option value="">- Any ' + $(column.header()).text() + ' -</option></select>')
                   .appendTo( $(column.header()).empty() )
